@@ -6,7 +6,8 @@ import StatCard from '../../components/StatCard';
 import ScreenLoader from '../../components/ScreenLoader';
 import { getStudentRecords } from '../../storage/attendanceStorage';
 import { logoutCurrentUser } from '../../storage/userStorage';
-import { isLowAttendance } from '../../utils/attendanceUtils';
+import StudentAttendanceAlertCard from '../../components/StudentAttendanceAlertCard';
+import { getStudentAttendanceAlert, isLowAttendance } from '../../utils/attendanceUtils';
 
 export default function StudentDashboardScreen({ navigation, route }) {
   const user = route.params?.user;
@@ -34,6 +35,7 @@ export default function StudentDashboardScreen({ navigation, route }) {
 
   const percentage = student?.percentage ?? 0;
   const low = isLowAttendance(percentage);
+  const attendanceAlert = getStudentAttendanceAlert(percentage);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -54,6 +56,16 @@ export default function StudentDashboardScreen({ navigation, route }) {
           {low ? 'Low Attendance Warning — below 75%' : 'Good Standing'}
         </Text>
       </View>
+
+      {attendanceAlert ? (
+        <StudentAttendanceAlertCard
+          alert={attendanceAlert}
+          percentage={percentage}
+          onViewPlan={() =>
+            navigation.navigate('StudentImprovementPlan', { user })
+          }
+        />
+      ) : null}
 
       <View style={styles.navCard}>
         <PrimaryButton

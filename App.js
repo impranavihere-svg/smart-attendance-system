@@ -30,6 +30,7 @@ import StudentLoginScreen from './screens/student/StudentLoginScreen';
 import StudentDashboardScreen from './screens/student/StudentDashboardScreen';
 import StudentMarkAttendanceScreen from './screens/student/StudentMarkAttendanceScreen';
 import StudentRecordsScreen from './screens/student/StudentRecordsScreen';
+import StudentImprovementPlanScreen from './screens/student/StudentImprovementPlanScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -83,6 +84,11 @@ export default function App() {
         <Stack.Screen name="StudentDashboard" component={StudentDashboardScreen} options={{ title: 'Student Dashboard', headerBackVisible: false }} />
         <Stack.Screen name="StudentMarkAttendance" component={StudentMarkAttendanceScreen} options={{ title: 'Mark Attendance' }} />
         <Stack.Screen name="StudentRecords" component={StudentRecordsScreen} options={{ title: 'My Records' }} />
+        <Stack.Screen
+          name="StudentImprovementPlan"
+          component={StudentImprovementPlanScreen}
+          options={{ title: 'Improvement Plan' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
