@@ -10,6 +10,7 @@ import WelcomeHeader from '../../components/WelcomeHeader';
 import { getAttendanceReport } from '../../storage/attendanceStorage';
 import {
   buildAttendanceTrend,
+  countSubstituteSessions,
   getClassStats,
   getSessionStats,
 } from '../../utils/analyticsUtils';
@@ -22,6 +23,7 @@ export default function FacultyAnalyticsScreen({ route }) {
   const [sessionStats, setSessionStats] = useState(null);
   const [recordCount, setRecordCount] = useState(0);
   const [trends, setTrends] = useState([]);
+  const [substituteCount, setSubstituteCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useFocusEffect(
@@ -40,6 +42,7 @@ export default function FacultyAnalyticsScreen({ route }) {
         setSessionStats(getSessionStats(sessions, classLogs));
         setRecordCount(classLogs.length);
         setTrends(buildAttendanceTrend(classLogs));
+        setSubstituteCount(countSubstituteSessions(sessions));
         setLoading(false);
       })();
     }, [user])
@@ -90,6 +93,13 @@ export default function FacultyAnalyticsScreen({ route }) {
           large
         />
       </View>
+      <StatCard
+        title="Substitute Classes Conducted"
+        value={substituteCount}
+        emoji="🔄"
+        variant="purple"
+        large
+      />
 
       <PremiumCard>
         <AnalyticsBar label="Class Attendance %" value={stats.classAttendancePercentage} />

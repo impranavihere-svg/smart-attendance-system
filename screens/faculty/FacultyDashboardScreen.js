@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import PrimaryButton from '../../components/PrimaryButton';
 import PremiumCard from '../../components/PremiumCard';
@@ -9,13 +9,8 @@ import ScreenLoader from '../../components/ScreenLoader';
 import WelcomeHeader from '../../components/WelcomeHeader';
 import { getClassStats } from '../../utils/analyticsUtils';
 import { logoutCurrentUser } from '../../storage/userStorage';
-import {
-  closeSession,
-  createAttendanceSession,
-  getActiveSessionForClass,
-} from '../../storage/sessionStorage';
+import { getActiveSessionForClass } from '../../storage/sessionStorage';
 import { getAttendanceReport } from '../../storage/attendanceStorage';
-import { SESSION_DURATION_OPTIONS } from '../../utils/constants';
 import { colors, spacing } from '../../utils/theme';
 
 export default function FacultyDashboardScreen({ navigation, route }) {
@@ -92,6 +87,11 @@ export default function FacultyDashboardScreen({ navigation, route }) {
           title="Create Attendance Session"
           icon="add-circle"
           onPress={() => navigation.navigate('FacultyCreateSession', { user })}
+        />
+        <PrimaryButton
+          title="Take Substitute Class"
+          icon="swap-horizontal"
+          onPress={() => navigation.navigate('SubstituteFaculty', { user })}
         />
         <PrimaryButton
           title="View Assigned Students"

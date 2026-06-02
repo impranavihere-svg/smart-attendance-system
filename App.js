@@ -22,6 +22,7 @@ import HodVerificationLogsScreen from './screens/hod/HodVerificationLogsScreen';
 import FacultyLoginScreen from './screens/faculty/FacultyLoginScreen';
 import FacultyDashboardScreen from './screens/faculty/FacultyDashboardScreen';
 import FacultyCreateSessionScreen from './screens/faculty/FacultyCreateSessionScreen';
+import SubstituteFacultyScreen from './screens/faculty/SubstituteFacultyScreen';
 import FacultyStudentsScreen from './screens/faculty/FacultyStudentsScreen';
 import FacultyReportsScreen from './screens/faculty/FacultyReportsScreen';
 import FacultyLowAttendanceScreen from './screens/faculty/FacultyLowAttendanceScreen';
@@ -74,6 +75,7 @@ export default function App() {
         <Stack.Screen name="FacultyLogin" component={FacultyLoginScreen} options={{ title: 'Faculty Login' }} />
         <Stack.Screen name="FacultyDashboard" component={FacultyDashboardScreen} options={{ title: 'Faculty Dashboard', headerBackVisible: false }} />
         <Stack.Screen name="FacultyCreateSession" component={FacultyCreateSessionScreen} options={{ title: 'Create Session' }} />
+        <Stack.Screen name="SubstituteFaculty" component={SubstituteFacultyScreen} options={{ title: 'Substitute Class' }} />
         <Stack.Screen name="FacultyStudents" component={FacultyStudentsScreen} options={{ title: 'Assigned Students' }} />
         <Stack.Screen name="FacultyReports" component={FacultyReportsScreen} options={{ title: 'Class Reports' }} />
         <Stack.Screen name="FacultyLowAttendance" component={FacultyLowAttendanceScreen} options={{ title: 'Low Attendance' }} />

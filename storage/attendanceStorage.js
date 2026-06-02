@@ -29,7 +29,7 @@ export async function bootstrapSampleData() {
   return syncSummaryFromUsers();
 }
 
-export async function markAttendance({ name, usn, classCode, sessionId }) {
+export async function markAttendance({ name, usn, classCode, sessionId, ...extraFields }) {
   const summary = await syncSummaryFromUsers();
   const logs = await readJson(ATTENDANCE_LOG_KEY, []);
   const normalizedUsn = usn.trim().toUpperCase();
@@ -62,6 +62,7 @@ export async function markAttendance({ name, usn, classCode, sessionId }) {
     classCode,
     sessionId: sessionId || null,
     markedAt: new Date().toISOString(),
+    ...extraFields,
   });
 
   await writeJson(STUDENT_SUMMARY_KEY, summary);
@@ -69,11 +70,21 @@ export async function markAttendance({ name, usn, classCode, sessionId }) {
 }
 
 export async function markSecureAttendance({ student, session }) {
+  const substituteFields = session?.isSubstituteClass
+    ? {
+        isSubstituteClass: true,
+        originalFaculty: session.originalFaculty,
+        substituteFaculty: session.substituteFaculty,
+        reason: session.reason,
+      }
+    : {};
+
   await markAttendance({
     name: student.name,
     usn: student.usn,
     classCode: session.sessionCode,
     sessionId: session.id,
+    ...substituteFields,
   });
 }
 

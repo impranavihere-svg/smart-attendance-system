@@ -12,20 +12,27 @@ import AdminReportStudentCard from '../../components/AdminReportStudentCard';
 import AttendanceLogCard from '../../components/AttendanceLogCard';
 import SearchBar from '../../components/SearchBar';
 import { getAdminDashboardData } from '../../storage/attendanceStorage';
+import { getAllSessions } from '../../storage/sessionStorage';
 import { filterStudentsByQuery } from '../../utils/searchUtils';
+import { buildSessionMap } from '../../utils/sessionLookup';
 
 export default function AdminAttendanceReportScreen() {
   const [students, setStudents] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [sessionMap, setSessionMap] = useState({});
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
-      const data = await getAdminDashboardData();
+      const [data, sessions] = await Promise.all([
+        getAdminDashboardData(),
+        getAllSessions(),
+      ]);
       setStudents(data.students);
       setLogs(data.logs);
+      setSessionMap(buildSessionMap(sessions));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -98,7 +105,11 @@ export default function AdminAttendanceReportScreen() {
               <Text style={styles.empty}>No log entries found.</Text>
             ) : (
               filteredLogs.map((log) => (
-                <AttendanceLogCard key={log.id} log={log} />
+                <AttendanceLogCard
+                  key={log.id}
+                  log={log}
+                  session={log.sessionId ? sessionMap[log.sessionId] : null}
+                />
               ))
             )}
           </>

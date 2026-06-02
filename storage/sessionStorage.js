@@ -39,6 +39,7 @@ export async function createAttendanceSession({
   facultyName,
   classSection,
   durationMinutes,
+  ...extraFields
 }) {
   const sessions = await getAllSessions();
   const now = new Date();
@@ -55,11 +56,34 @@ export async function createAttendanceSession({
     startedAt: now.toISOString(),
     endsAt: endsAt.toISOString(),
     status: 'active',
+    ...extraFields,
   };
 
   sessions.unshift(session);
   await writeJson(SESSIONS_KEY, sessions);
   return session;
+}
+
+export async function createSubstituteAttendanceSession({
+  facultyId,
+  facultyName,
+  classSection,
+  durationMinutes,
+  originalFaculty,
+  subjectName,
+  reason,
+}) {
+  return createAttendanceSession({
+    facultyId,
+    facultyName,
+    classSection,
+    durationMinutes,
+    subjectName: subjectName?.trim() || '',
+    isSubstituteClass: true,
+    originalFaculty: originalFaculty.trim(),
+    substituteFaculty: facultyName,
+    reason,
+  });
 }
 
 export async function closeSession(sessionId) {

@@ -79,3 +79,7 @@ export function getSessionStats(sessions, logs) {
     totalMarks: logs.length,
   };
 }
+
+export function countSubstituteSessions(sessions) {
+  return sessions.filter((session) => session.isSubstituteClass === true).length;
+}

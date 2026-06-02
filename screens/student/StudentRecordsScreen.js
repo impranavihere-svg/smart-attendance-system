@@ -5,19 +5,26 @@ import AttendanceLogCard from '../../components/AttendanceLogCard';
 import AdminReportStudentCard from '../../components/AdminReportStudentCard';
 import ScreenLoader from '../../components/ScreenLoader';
 import { getStudentRecords } from '../../storage/attendanceStorage';
+import { getAllSessions } from '../../storage/sessionStorage';
+import { buildSessionMap } from '../../utils/sessionLookup';
 
 export default function StudentRecordsScreen({ route }) {
   const user = route.params?.user;
   const [student, setStudent] = useState(null);
   const [history, setHistory] = useState([]);
+  const [sessionMap, setSessionMap] = useState({});
   const [loading, setLoading] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
       (async () => {
-        const data = await getStudentRecords(user.usn);
+        const [data, sessions] = await Promise.all([
+          getStudentRecords(user.usn),
+          getAllSessions(),
+        ]);
         setStudent(data.student);
         setHistory(data.history);
+        setSessionMap(buildSessionMap(sessions));
         setLoading(false);
       })();
     }, [user])
@@ -37,7 +44,12 @@ export default function StudentRecordsScreen({ route }) {
       <FlatList
         data={history}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <AttendanceLogCard log={item} />}
+        renderItem={({ item }) => (
+          <AttendanceLogCard
+            log={item}
+            session={item.sessionId ? sessionMap[item.sessionId] : null}
+          />
+        )}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <Text style={styles.empty}>No attendance history yet.</Text>

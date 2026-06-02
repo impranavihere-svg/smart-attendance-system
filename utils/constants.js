@@ -28,3 +28,10 @@ export const AUTHORIZED_WIFI_KEYWORDS = [
 export const ALLOW_DEMO_CAMPUS_BYPASS = true;
 
 export const SESSION_DURATION_OPTIONS = [10, 15, 30, 45];
+
+export const SUBSTITUTE_REASONS = [
+  'Faculty Leave',
+  'Emergency',
+  'Meeting Duty',
+  'Other',
+];

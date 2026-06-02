@@ -10,23 +10,30 @@ import WelcomeHeader from '../../components/WelcomeHeader';
 import { getHodDashboardData } from '../../storage/attendanceStorage';
 import {
   buildAttendanceTrend,
+  countSubstituteSessions,
   getDepartmentStats,
 } from '../../utils/analyticsUtils';
+import { getAllSessions } from '../../storage/sessionStorage';
 import { colors, spacing } from '../../utils/theme';
 
 export default function HodAnalyticsScreen() {
   const [stats, setStats] = useState(null);
   const [recordCount, setRecordCount] = useState(0);
   const [trends, setTrends] = useState([]);
+  const [substituteCount, setSubstituteCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useFocusEffect(
     useCallback(() => {
       (async () => {
-        const data = await getHodDashboardData();
+        const [data, sessions] = await Promise.all([
+          getHodDashboardData(),
+          getAllSessions(),
+        ]);
         setStats(getDepartmentStats(data.students));
         setRecordCount(data.logs.length);
         setTrends(buildAttendanceTrend(data.logs));
+        setSubstituteCount(countSubstituteSessions(sessions));
         setLoading(false);
       })();
     }, [])
@@ -75,6 +82,13 @@ export default function HodAnalyticsScreen() {
           large
         />
       </View>
+      <StatCard
+        title="Substitute Classes Conducted"
+        value={substituteCount}
+        emoji="🔄"
+        variant="purple"
+        large
+      />
 
       <PremiumCard>
         <AnalyticsBar

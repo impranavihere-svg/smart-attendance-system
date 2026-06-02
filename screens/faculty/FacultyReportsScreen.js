@@ -6,13 +6,16 @@ import AttendanceLogCard from '../../components/AttendanceLogCard';
 import SearchBar from '../../components/SearchBar';
 import ScreenLoader from '../../components/ScreenLoader';
 import { getAttendanceReport } from '../../storage/attendanceStorage';
+import { getAllSessions } from '../../storage/sessionStorage';
 import { filterStudentsByQuery } from '../../utils/searchUtils';
+import { buildSessionMap } from '../../utils/sessionLookup';
 import { getStudentsByClass } from '../../storage/userStorage';
 
 export default function FacultyReportsScreen({ route }) {
   const user = route.params?.user;
   const [students, setStudents] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [sessionMap, setSessionMap] = useState({});
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -21,9 +24,13 @@ export default function FacultyReportsScreen({ route }) {
       (async () => {
         const assigned = await getStudentsByClass(user.assignedClass);
         const usnSet = new Set(assigned.map((s) => s.usn));
-        const { report, logs: allLogs } = await getAttendanceReport();
+        const [{ report, logs: allLogs }, sessions] = await Promise.all([
+          getAttendanceReport(),
+          getAllSessions(),
+        ]);
         setStudents(report.filter((s) => usnSet.has(s.usn)));
         setLogs(allLogs.filter((l) => usnSet.has(l.usn)));
+        setSessionMap(buildSessionMap(sessions));
         setLoading(false);
       })();
     }, [user])
@@ -57,7 +64,11 @@ export default function FacultyReportsScreen({ route }) {
           <>
             <Text style={styles.section}>Class Log Entries</Text>
             {filteredLogs.map((log) => (
-              <AttendanceLogCard key={log.id} log={log} />
+              <AttendanceLogCard
+                key={log.id}
+                log={log}
+                session={log.sessionId ? sessionMap[log.sessionId] : null}
+              />
             ))}
           </>
         }
