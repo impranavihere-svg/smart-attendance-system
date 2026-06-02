@@ -57,15 +57,7 @@ export default function StudentDashboardScreen({ navigation, route }) {
         </Text>
       </View>
 
-      {attendanceAlert ? (
-        <StudentAttendanceAlertCard
-          alert={attendanceAlert}
-          percentage={percentage}
-          onViewPlan={() =>
-            navigation.navigate('StudentImprovementPlan', { user })
-          }
-        />
-      ) : null}
+      <Text>Attendance Alert Test</Text>
 
       <View style={styles.navCard}>
         <PrimaryButton
