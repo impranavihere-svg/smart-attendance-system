@@ -2,28 +2,27 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import PrimaryButton from './PrimaryButton';
+import QuoteOfTheDayCard from './QuoteOfTheDayCard';
+import { cardShadow, colors, radii, spacing } from '../utils/theme';
 
 const TIER_STYLES = {
   caution: {
-    card: { backgroundColor: '#FFF8E1', borderColor: '#FFE082' },
-    icon: '#F9A825',
+    card: { backgroundColor: '#FFFDF5', borderColor: '#FFE082' },
+    icon: colors.warning,
     title: '#F57F17',
-    quote: '#5D4037',
-    percentage: '#E65100',
+    accent: colors.warning,
   },
   warning: {
-    card: { backgroundColor: '#FFF3E0', borderColor: '#FFCC80' },
+    card: { backgroundColor: '#FFF8F0', borderColor: '#FFCC80' },
     icon: '#EF6C00',
     title: '#E65100',
-    quote: '#4E342E',
-    percentage: '#BF360C',
+    accent: '#EF6C00',
   },
   critical: {
-    card: { backgroundColor: '#FFEBEE', borderColor: '#EF9A9A' },
-    icon: '#C62828',
-    title: '#C62828',
-    quote: '#4E342E',
-    percentage: '#B71C1C',
+    card: { backgroundColor: '#FFF5F5', borderColor: '#EF9A9A' },
+    icon: colors.danger,
+    title: colors.danger,
+    accent: colors.danger,
   },
 };
 
@@ -31,16 +30,19 @@ export default function StudentAttendanceAlertCard({ alert, percentage, onViewPl
   const theme = TIER_STYLES[alert.tier];
 
   return (
-    <View style={[styles.card, theme.card]}>
+    <View style={[styles.card, theme.card, cardShadow(theme.accent)]}>
       <View style={styles.header}>
-        <Ionicons name="alert-circle" size={22} color={theme.icon} />
-        <Text style={[styles.title, { color: theme.title }]}>{alert.title}</Text>
+        <Ionicons name="alert-circle" size={24} color={theme.icon} />
+        <View style={styles.headerText}>
+          <Text style={[styles.title, { color: theme.title }]}>{alert.title}</Text>
+          <Text style={[styles.percentage, { color: theme.title }]}>
+            Current attendance: {percentage}%
+          </Text>
+        </View>
       </View>
-      <Text style={[styles.percentage, { color: theme.percentage }]}>
-        Current attendance: {percentage}%
-      </Text>
-      <Text style={[styles.quoteLabel, { color: theme.title }]}>Quote of the Day</Text>
-      <Text style={[styles.quote, { color: theme.quote }]}>&ldquo;{alert.quote}&rdquo;</Text>
+
+      <QuoteOfTheDayCard quote={alert.quote} accent={theme.accent} />
+
       <PrimaryButton
         title="View Improvement Plan"
         icon="trending-up"
@@ -52,37 +54,27 @@ export default function StudentAttendanceAlertCard({ alert, percentage, onViewPl
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 10,
+    borderRadius: radii.card,
+    padding: spacing.lg,
+    marginTop: spacing.sm,
     borderWidth: 1,
-    elevation: 2,
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  headerText: {
+    flex: 1,
   },
   title: {
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '800',
   },
   percentage: {
+    marginTop: 4,
     fontSize: 14,
     fontWeight: '700',
-    marginBottom: 10,
-  },
-  quoteLabel: {
-    fontSize: 12,
-    fontWeight: '800',
-    marginBottom: 4,
-  },
-  quote: {
-    fontSize: 14,
-    fontWeight: '600',
-    fontStyle: 'italic',
-    lineHeight: 21,
-    marginBottom: 4,
   },
 });

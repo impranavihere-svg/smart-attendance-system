@@ -38,7 +38,7 @@ const screenOptions = {
   headerStyle: { backgroundColor: '#0D47A1' },
   headerTintColor: '#FFFFFF',
   headerTitleStyle: { fontWeight: '700' },
-  contentStyle: { backgroundColor: '#F5F9FF' },
+  contentStyle: { backgroundColor: '#F5F7FB' },
 };
 
 export default function App() {

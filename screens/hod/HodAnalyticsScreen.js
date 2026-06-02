@@ -2,17 +2,21 @@ import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AnalyticsBar from '../../components/AnalyticsBar';
+import PremiumCard from '../../components/PremiumCard';
 import StatCard from '../../components/StatCard';
 import TrendRow from '../../components/TrendRow';
 import ScreenLoader from '../../components/ScreenLoader';
+import WelcomeHeader from '../../components/WelcomeHeader';
 import { getHodDashboardData } from '../../storage/attendanceStorage';
 import {
   buildAttendanceTrend,
   getDepartmentStats,
 } from '../../utils/analyticsUtils';
+import { colors, spacing } from '../../utils/theme';
 
 export default function HodAnalyticsScreen() {
   const [stats, setStats] = useState(null);
+  const [recordCount, setRecordCount] = useState(0);
   const [trends, setTrends] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,6 +25,7 @@ export default function HodAnalyticsScreen() {
       (async () => {
         const data = await getHodDashboardData();
         setStats(getDepartmentStats(data.students));
+        setRecordCount(data.logs.length);
         setTrends(buildAttendanceTrend(data.logs));
         setLoading(false);
       })();
@@ -31,22 +36,55 @@ export default function HodAnalyticsScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Department Analytics</Text>
+      <WelcomeHeader
+        title="Department Analytics"
+        subtitle={stats.departmentName}
+        meta="Live department attendance insights"
+        icon="analytics"
+      />
+
       <View style={styles.row}>
-        <StatCard title="Students" value={stats.totalStudents} icon="people" />
-        <StatCard title="Low Attendance" value={stats.lowAttendanceCount} icon="warning" accent="#C62828" />
+        <StatCard
+          title="Total Students"
+          value={stats.totalStudents}
+          emoji="👨‍🎓"
+          variant="primary"
+          large
+        />
+        <StatCard
+          title="Low Attendance Students"
+          value={stats.lowAttendanceCount}
+          emoji="📉"
+          variant="danger"
+          large
+        />
+      </View>
+      <View style={styles.row}>
+        <StatCard
+          title="Average Attendance"
+          value={`${stats.departmentAttendancePercentage}%`}
+          emoji="📈"
+          variant="success"
+          large
+        />
+        <StatCard
+          title="Attendance Records"
+          value={recordCount}
+          emoji="📋"
+          variant="secondary"
+          large
+        />
       </View>
 
-      <View style={styles.card}>
+      <PremiumCard>
         <AnalyticsBar
           label="Department Attendance %"
           value={stats.departmentAttendancePercentage}
-          color="#1565C0"
+          color={colors.primary}
         />
-        <Text style={styles.note}>{stats.departmentName}</Text>
-      </View>
+      </PremiumCard>
 
-      <View style={styles.card}>
+      <PremiumCard>
         <Text style={styles.section}>Attendance Trends</Text>
         {trends.length === 0 ? (
           <Text style={styles.note}>No trend data yet.</Text>
@@ -55,23 +93,15 @@ export default function HodAnalyticsScreen() {
             <TrendRow key={item.label} label={item.label} count={item.count} />
           ))
         )}
-      </View>
+      </PremiumCard>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#EAF3FF' },
-  content: { padding: 16, paddingBottom: 28 },
-  title: { fontSize: 20, fontWeight: '800', color: '#0D47A1', marginBottom: 12 },
-  row: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },
-  card: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 12,
-    elevation: 2,
-  },
-  section: { fontSize: 16, fontWeight: '800', color: '#0D47A1', marginBottom: 10 },
-  note: { color: '#546E7A', fontWeight: '600' },
+  container: { flex: 1, backgroundColor: colors.background },
+  content: { padding: spacing.md, paddingBottom: 32 },
+  row: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -6 },
+  section: { fontSize: 16, fontWeight: '800', color: colors.text, marginBottom: spacing.sm },
+  note: { color: colors.textSoft, fontWeight: '600' },
 });

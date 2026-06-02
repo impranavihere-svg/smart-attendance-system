@@ -2,9 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import PrimaryButton from '../../components/PrimaryButton';
+import PremiumCard from '../../components/PremiumCard';
 import SessionCard from '../../components/SessionCard';
 import StatCard from '../../components/StatCard';
 import ScreenLoader from '../../components/ScreenLoader';
+import WelcomeHeader from '../../components/WelcomeHeader';
 import { getClassStats } from '../../utils/analyticsUtils';
 import { logoutCurrentUser } from '../../storage/userStorage';
 import {
@@ -14,6 +16,7 @@ import {
 } from '../../storage/sessionStorage';
 import { getAttendanceReport } from '../../storage/attendanceStorage';
 import { SESSION_DURATION_OPTIONS } from '../../utils/constants';
+import { colors, spacing } from '../../utils/theme';
 
 export default function FacultyDashboardScreen({ navigation, route }) {
   const user = route.params?.user;
@@ -49,31 +52,42 @@ export default function FacultyDashboardScreen({ navigation, route }) {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{user.name}</Text>
-        <Text style={styles.sub}>Assigned Class: {user.assignedClass}</Text>
-      </View>
+      <WelcomeHeader
+        title="Good Morning, Professor"
+        subtitle={user.name}
+        meta={`Assigned Class: ${user.assignedClass}`}
+        icon="easel"
+        accent={colors.primary}
+      />
 
       <View style={styles.row}>
-        <StatCard title="Class Students" value={classStats.totalStudents} icon="people" />
+        <StatCard
+          title="Class Students"
+          value={classStats.totalStudents}
+          icon="people"
+          variant="primary"
+          large
+        />
         <StatCard
           title="Class Attendance"
           value={`${classStats.classAttendancePercentage}%`}
           icon="stats-chart"
-          accent="#00838F"
+          variant="teal"
+          large
         />
       </View>
 
-      <View style={styles.card}>
+      <PremiumCard>
         <Text style={styles.section}>Active Session Status</Text>
         {activeSession ? (
           <SessionCard session={activeSession} />
         ) : (
           <Text style={styles.note}>No active session for your class.</Text>
         )}
-      </View>
+      </PremiumCard>
 
-      <View style={styles.navCard}>
+      <PremiumCard style={styles.navCard}>
+        <Text style={styles.navTitle}>Faculty Tools</Text>
         <PrimaryButton
           title="Create Attendance Session"
           icon="add-circle"
@@ -99,44 +113,28 @@ export default function FacultyDashboardScreen({ navigation, route }) {
           icon="analytics"
           onPress={() => navigation.navigate('FacultyAnalytics', { user })}
         />
-        <PrimaryButton title="Logout" icon="log-out-outline" onPress={handleLogout} />
-      </View>
+        <PrimaryButton title="Logout" icon="log-out-outline" onPress={handleLogout} variant="danger" />
+      </PremiumCard>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#EAF3FF' },
-  content: { padding: 16, paddingBottom: 28 },
-  header: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 2,
-  },
-  title: { fontSize: 20, fontWeight: '800', color: '#0D47A1' },
-  sub: { marginTop: 4, color: '#546E7A', fontWeight: '600' },
-  row: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },
-  card: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 14,
-    marginTop: 8,
-    elevation: 2,
-  },
+  container: { flex: 1, backgroundColor: colors.background },
+  content: { padding: spacing.md, paddingBottom: 32 },
+  row: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -6 },
   section: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '800',
-    color: '#0D47A1',
-    marginBottom: 8,
+    color: colors.text,
+    marginBottom: spacing.sm,
   },
-  note: { color: '#78909C', fontWeight: '600' },
-  navCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 14,
-    marginTop: 12,
-    elevation: 2,
+  note: { color: colors.textSoft, fontWeight: '600' },
+  navCard: { marginBottom: 0 },
+  navTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: colors.text,
+    marginBottom: spacing.xs,
   },
 });

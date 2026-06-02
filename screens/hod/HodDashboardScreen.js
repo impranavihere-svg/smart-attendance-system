@@ -1,14 +1,16 @@
 import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import PrimaryButton from '../../components/PrimaryButton';
+import PremiumCard from '../../components/PremiumCard';
 import StatCard from '../../components/StatCard';
 import ScreenLoader from '../../components/ScreenLoader';
+import WelcomeHeader from '../../components/WelcomeHeader';
 import { getHodDashboardData } from '../../storage/attendanceStorage';
 import { getActiveSessions } from '../../storage/sessionStorage';
 import { logoutCurrentUser } from '../../storage/userStorage';
 import { getDepartmentStats } from '../../utils/analyticsUtils';
+import { colors, spacing } from '../../utils/theme';
 
 export default function HodDashboardScreen({ navigation, route }) {
   const user = route.params?.user;
@@ -47,23 +49,44 @@ export default function HodDashboardScreen({ navigation, route }) {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.header}>
-        <Ionicons name="business" size={36} color="#0D47A1" />
-        <Text style={styles.title}>HOD Dashboard</Text>
-        <Text style={styles.sub}>{user?.name} • {user?.department}</Text>
-      </View>
+      <WelcomeHeader
+        title="Department Overview"
+        subtitle={user?.name}
+        meta={user?.department}
+        icon="business"
+        accent={colors.primary}
+      />
 
       <View style={styles.row}>
-        <StatCard title="Total Students" value={stats.totalStudents} icon="people" />
-        <StatCard title="Total Faculty" value={stats.totalFaculty} icon="person" accent="#1976D2" />
+        <StatCard title="Total Students" value={stats.totalStudents} icon="people" variant="primary" large />
+        <StatCard title="Total Faculty" value={stats.totalFaculty} icon="person" variant="secondary" large />
       </View>
       <View style={styles.row}>
-        <StatCard title="Dept Attendance" value={`${stats.departmentAttendancePercentage}%`} icon="stats-chart" accent="#00838F" />
-        <StatCard title="Low Attendance" value={stats.lowAttendanceCount} icon="warning" accent="#C62828" />
+        <StatCard
+          title="Dept Attendance"
+          value={`${stats.departmentAttendancePercentage}%`}
+          icon="stats-chart"
+          variant="teal"
+          large
+        />
+        <StatCard
+          title="Low Attendance"
+          value={stats.lowAttendanceCount}
+          icon="warning"
+          variant="danger"
+          large
+        />
       </View>
-      <StatCard title="Active Sessions" value={stats.activeSessions} icon="time" accent="#6A1B9A" />
+      <StatCard
+        title="Active Sessions"
+        value={stats.activeSessions}
+        icon="time"
+        variant="purple"
+        large
+      />
 
-      <View style={styles.navCard}>
+      <PremiumCard style={styles.navCard}>
+        <Text style={styles.navTitle}>Department Controls</Text>
         <PrimaryButton title="View All Students" icon="list" onPress={() => navigation.navigate('HodStudents', { user })} />
         <PrimaryButton title="View All Faculty" icon="people-circle" onPress={() => navigation.navigate('HodFaculty', { user })} />
         <PrimaryButton title="Department Analytics" icon="analytics" onPress={() => navigation.navigate('HodAnalytics', { user })} />
@@ -71,18 +94,21 @@ export default function HodDashboardScreen({ navigation, route }) {
         <PrimaryButton title="Low Attendance Alerts" icon="alert-circle" onPress={() => navigation.navigate('HodLowAttendance', { user })} />
         <PrimaryButton title="Faculty Management" icon="construct" onPress={() => navigation.navigate('HodFacultyManagement', { user })} />
         <PrimaryButton title="Campus Verification Logs" icon="shield-checkmark" onPress={() => navigation.navigate('HodVerificationLogs', { user })} />
-        <PrimaryButton title="Logout" icon="log-out-outline" onPress={handleLogout} />
-      </View>
+        <PrimaryButton title="Logout" icon="log-out-outline" onPress={handleLogout} variant="danger" />
+      </PremiumCard>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#EAF3FF' },
-  content: { padding: 16, paddingBottom: 28 },
-  header: { backgroundColor: '#FFF', borderRadius: 16, padding: 18, alignItems: 'center', marginBottom: 12, elevation: 2 },
-  title: { marginTop: 8, fontSize: 22, fontWeight: '800', color: '#0D47A1' },
-  sub: { marginTop: 4, color: '#546E7A', fontWeight: '600' },
-  row: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -4 },
-  navCard: { backgroundColor: '#FFF', borderRadius: 16, padding: 14, marginTop: 12, elevation: 2 },
+  container: { flex: 1, backgroundColor: colors.background },
+  content: { padding: spacing.md, paddingBottom: 32 },
+  row: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -6 },
+  navCard: { marginBottom: 0 },
+  navTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: colors.text,
+    marginBottom: spacing.xs,
+  },
 });

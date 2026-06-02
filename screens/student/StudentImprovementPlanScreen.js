@@ -1,24 +1,29 @@
 import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
+import AttendanceProgressRing from '../../components/AttendanceProgressRing';
+import GoalProgressCard from '../../components/GoalProgressCard';
+import PremiumCard from '../../components/PremiumCard';
+import QuoteOfTheDayCard from '../../components/QuoteOfTheDayCard';
 import ScreenLoader from '../../components/ScreenLoader';
+import WelcomeHeader from '../../components/WelcomeHeader';
 import { getStudentRecords } from '../../storage/attendanceStorage';
 import {
   estimateClassesToReachTarget,
   getStudentAttendanceAlert,
 } from '../../utils/attendanceUtils';
+import { colors, spacing } from '../../utils/theme';
 
 const TARGETS = [65, 70, 75];
 
-function formatClassesNeeded(count) {
+function formatGoalStatus(count) {
   if (count === 0) {
-    return 'Already at or above this goal';
+    return 'Already achieved';
   }
   if (count === 1) {
-    return '1 more class';
+    return '1 more class needed';
   }
-  return `${count} more classes`;
+  return `${count} more classes needed`;
 }
 
 export default function StudentImprovementPlanScreen({ route }) {
@@ -46,28 +51,24 @@ export default function StudentImprovementPlanScreen({ route }) {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.hero}>
-        <Ionicons name="school" size={28} color="#0D47A1" />
-        <Text style={styles.heroTitle}>Improvement Plan</Text>
-        <Text style={styles.heroSubtitle}>{user.name}</Text>
-      </View>
+      <WelcomeHeader
+        title="Improvement Plan"
+        subtitle={user.name}
+        meta="Track your path to better attendance"
+        icon="trending-up"
+      />
 
-      <View style={styles.currentCard}>
+      <PremiumCard>
         <Text style={styles.currentLabel}>Current Attendance</Text>
-        <Text style={styles.currentValue}>{percentage}%</Text>
+        <AttendanceProgressRing percentage={percentage} label="Overall" />
         <Text style={styles.currentMeta}>
           Present: {present} / {totalClasses} classes
         </Text>
-      </View>
+      </PremiumCard>
 
-      {alert ? (
-        <View style={styles.quoteCard}>
-          <Text style={styles.quoteLabel}>Quote of the Day</Text>
-          <Text style={styles.quoteText}>&ldquo;{alert.quote}&rdquo;</Text>
-        </View>
-      ) : null}
+      {alert ? <QuoteOfTheDayCard quote={alert.quote} accent={colors.primary} /> : null}
 
-      <Text style={styles.sectionTitle}>Estimated classes needed</Text>
+      <Text style={styles.sectionTitle}>Goal Progress</Text>
       <Text style={styles.sectionHint}>
         Based on attending upcoming classes without additional absences.
       </Text>
@@ -75,18 +76,17 @@ export default function StudentImprovementPlanScreen({ route }) {
       {TARGETS.map((target) => {
         const needed = estimateClassesToReachTarget(present, totalClasses, target);
         return (
-          <View key={target} style={styles.targetCard}>
-            <View style={styles.targetHeader}>
-              <Ionicons name="flag" size={20} color="#1565C0" />
-              <Text style={styles.targetTitle}>Reach {target}%</Text>
-            </View>
-            <Text style={styles.targetValue}>{formatClassesNeeded(needed)}</Text>
-          </View>
+          <GoalProgressCard
+            key={target}
+            target={target}
+            achieved={needed === 0}
+            statusText={formatGoalStatus(needed)}
+          />
         );
       })}
 
       <View style={styles.recommendation}>
-        <Ionicons name="information-circle" size={22} color="#1565C0" />
+        <Text style={styles.recommendationEmoji}>ℹ️</Text>
         <Text style={styles.recommendationText}>
           Attend upcoming classes regularly to improve your attendance.
         </Text>
@@ -96,124 +96,53 @@ export default function StudentImprovementPlanScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#EAF3FF' },
-  content: { padding: 16, paddingBottom: 28 },
-  hero: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 12,
-    elevation: 2,
-  },
-  heroTitle: {
-    marginTop: 8,
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#0D47A1',
-  },
-  heroSubtitle: {
-    marginTop: 4,
-    color: '#546E7A',
-    fontWeight: '600',
-  },
-  currentCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    borderLeftWidth: 6,
-    borderLeftColor: '#1565C0',
-    elevation: 2,
-  },
+  container: { flex: 1, backgroundColor: colors.background },
+  content: { padding: spacing.md, paddingBottom: 32 },
   currentLabel: {
     fontSize: 13,
-    color: '#78909C',
-    fontWeight: '600',
-  },
-  currentValue: {
-    marginTop: 6,
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#0D47A1',
+    color: colors.textSoft,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: spacing.xs,
   },
   currentMeta: {
-    marginTop: 6,
-    color: '#546E7A',
+    marginTop: spacing.sm,
+    textAlign: 'center',
+    color: colors.textMuted,
     fontWeight: '600',
-  },
-  quoteCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 12,
-    elevation: 2,
-  },
-  quoteLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#78909C',
-    marginBottom: 6,
-  },
-  quoteText: {
-    fontSize: 14,
-    fontWeight: '600',
-    fontStyle: 'italic',
-    color: '#37474F',
-    lineHeight: 21,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '800',
-    color: '#0D47A1',
+    color: colors.text,
     marginBottom: 4,
   },
   sectionHint: {
     fontSize: 13,
-    color: '#78909C',
+    color: colors.textSoft,
     fontWeight: '600',
-    marginBottom: 10,
-  },
-  targetCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
-    elevation: 2,
-  },
-  targetHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
-  },
-  targetTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#1565C0',
-  },
-  targetValue: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#37474F',
-    marginLeft: 28,
+    marginBottom: spacing.md,
+    lineHeight: 18,
   },
   recommendation: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 10,
+    gap: spacing.sm,
     backgroundColor: '#E3F2FD',
-    borderRadius: 14,
-    padding: 14,
-    marginTop: 6,
+    borderRadius: 22,
+    padding: spacing.lg,
+    marginTop: spacing.sm,
     borderWidth: 1,
     borderColor: '#90CAF9',
+  },
+  recommendationEmoji: {
+    fontSize: 18,
   },
   recommendationText: {
     flex: 1,
     fontSize: 14,
     fontWeight: '700',
-    color: '#0D47A1',
+    color: colors.primary,
     lineHeight: 20,
   },
 });

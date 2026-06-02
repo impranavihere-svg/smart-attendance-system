@@ -7,11 +7,13 @@ import {
   View,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
 import PrimaryButton from '../../components/PrimaryButton';
+import PremiumCard from '../../components/PremiumCard';
 import StatCard from '../../components/StatCard';
+import WelcomeHeader from '../../components/WelcomeHeader';
 import { getAdminDashboardData } from '../../storage/attendanceStorage';
 import { isLowAttendance } from '../../utils/attendanceUtils';
+import { colors, spacing } from '../../utils/theme';
 
 export default function AdminDashboardScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -20,6 +22,7 @@ export default function AdminDashboardScreen({ navigation }) {
     totalEntries: 0,
     lowCount: 0,
     goodCount: 0,
+    averageAttendance: 0,
   });
 
   const loadDashboard = useCallback(async () => {
@@ -28,12 +31,22 @@ export default function AdminDashboardScreen({ navigation }) {
       const lowCount = data.students.filter((s) =>
         isLowAttendance(s.percentage)
       ).length;
+      const averageAttendance =
+        data.students.length === 0
+          ? 0
+          : Number(
+              (
+                data.students.reduce((sum, s) => sum + (s.percentage ?? 0), 0) /
+                data.students.length
+              ).toFixed(1)
+            );
 
       setStats({
         totalStudents: data.totalStudents,
         totalEntries: data.totalEntries,
         lowCount,
         goodCount: data.totalStudents - lowCount,
+        averageAttendance,
       });
     } finally {
       setLoading(false);
@@ -50,7 +63,7 @@ export default function AdminDashboardScreen({ navigation }) {
   if (loading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#1565C0" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loaderText}>Loading dashboard...</Text>
       </View>
     );
@@ -58,24 +71,44 @@ export default function AdminDashboardScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.welcomeCard}>
-        <Ionicons name="person-circle" size={40} color="#0D47A1" />
-        <Text style={styles.welcomeTitle}>Admin Dashboard</Text>
-        <Text style={styles.welcomeSub}>Smart Attendance Management</Text>
-      </View>
+      <WelcomeHeader
+        title="Admin Dashboard"
+        subtitle="Smart Attendance Management"
+        meta="System-wide analytics overview"
+        icon="person-circle"
+      />
 
       <View style={styles.statsRow}>
         <StatCard
           title="Total Students"
           value={stats.totalStudents}
-          icon="people"
-          accent="#1565C0"
+          emoji="👨‍🎓"
+          variant="primary"
+          large
         />
         <StatCard
-          title="Attendance Entries"
+          title="Low Attendance Students"
+          value={stats.lowCount}
+          emoji="📉"
+          variant="danger"
+          large
+        />
+      </View>
+
+      <View style={styles.statsRow}>
+        <StatCard
+          title="Average Attendance"
+          value={`${stats.averageAttendance}%`}
+          emoji="📈"
+          variant="success"
+          large
+        />
+        <StatCard
+          title="Attendance Records"
           value={stats.totalEntries}
-          icon="clipboard"
-          accent="#1976D2"
+          emoji="📋"
+          variant="secondary"
+          large
         />
       </View>
 
@@ -84,17 +117,11 @@ export default function AdminDashboardScreen({ navigation }) {
           title="Good Attendance"
           value={stats.goodCount}
           icon="checkmark-circle"
-          accent="#2E7D32"
-        />
-        <StatCard
-          title="Low Attendance"
-          value={stats.lowCount}
-          icon="alert-circle"
-          accent="#C62828"
+          variant="success"
         />
       </View>
 
-      <View style={styles.navCard}>
+      <PremiumCard style={styles.navCard}>
         <Text style={styles.sectionTitle}>Quick Navigation</Text>
         <PrimaryButton
           title="Student List"
@@ -115,8 +142,9 @@ export default function AdminDashboardScreen({ navigation }) {
           title="Logout"
           icon="log-out-outline"
           onPress={() => navigation.replace('Home')}
+          variant="danger"
         />
-      </View>
+      </PremiumCard>
     </ScrollView>
   );
 }
@@ -124,60 +152,34 @@ export default function AdminDashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EAF3FF',
+    backgroundColor: colors.background,
   },
   content: {
-    padding: 16,
-    paddingBottom: 28,
+    padding: spacing.md,
+    paddingBottom: 32,
   },
   loader: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#EAF3FF',
+    backgroundColor: colors.background,
   },
   loaderText: {
     marginTop: 10,
-    color: '#1565C0',
-    fontWeight: '600',
-  },
-  welcomeCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 20,
-    alignItems: 'center',
-    marginBottom: 16,
-    elevation: 2,
-  },
-  welcomeTitle: {
-    marginTop: 8,
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#0D47A1',
-  },
-  welcomeSub: {
-    marginTop: 4,
-    fontSize: 14,
-    color: '#546E7A',
+    color: colors.primary,
     fontWeight: '600',
   },
   statsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -4,
-    marginBottom: 8,
+    marginHorizontal: -6,
+    marginBottom: 4,
   },
-  navCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 16,
-    marginTop: 8,
-    elevation: 2,
-  },
+  navCard: { marginBottom: 0 },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#0D47A1',
-    marginBottom: 4,
+    color: colors.text,
+    marginBottom: spacing.xs,
   },
 });
