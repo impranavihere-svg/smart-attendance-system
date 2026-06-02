@@ -39,6 +39,7 @@ export default function StudentAttendanceAlertCard({ alert, percentage, onViewPl
       <Text style={[styles.percentage, { color: theme.percentage }]}>
         Current attendance: {percentage}%
       </Text>
+      <Text style={[styles.quoteLabel, { color: theme.title }]}>Quote of the Day</Text>
       <Text style={[styles.quote, { color: theme.quote }]}>&ldquo;{alert.quote}&rdquo;</Text>
       <PrimaryButton
         title="View Improvement Plan"
@@ -71,6 +72,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 10,
+  },
+  quoteLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    marginBottom: 4,
   },
   quote: {
     fontSize: 14,

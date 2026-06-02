@@ -14,13 +14,16 @@ export default function StudentDashboardScreen({ navigation, route }) {
   const [student, setStudent] = useState(null);
   const [historyCount, setHistoryCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [attendanceAlert, setAttendanceAlert] = useState(null);
 
   useFocusEffect(
     useCallback(() => {
       (async () => {
         const { student: record, history } = await getStudentRecords(user.usn);
+        const percentage = record?.percentage ?? 0;
         setStudent(record);
         setHistoryCount(history.length);
+        setAttendanceAlert(getStudentAttendanceAlert(percentage));
         setLoading(false);
       })();
     }, [user])
@@ -35,7 +38,6 @@ export default function StudentDashboardScreen({ navigation, route }) {
 
   const percentage = student?.percentage ?? 0;
   const low = isLowAttendance(percentage);
-  const attendanceAlert = getStudentAttendanceAlert(percentage);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -57,7 +59,18 @@ export default function StudentDashboardScreen({ navigation, route }) {
         </Text>
       </View>
 
-      <Text>Attendance Alert Test</Text>
+      {attendanceAlert ? (
+        <StudentAttendanceAlertCard
+          alert={attendanceAlert}
+          percentage={percentage}
+          onViewPlan={() =>
+            navigation.navigate('StudentImprovementPlan', {
+              user,
+              quote: attendanceAlert.quote,
+            })
+          }
+        />
+      ) : null}
 
       <View style={styles.navCard}>
         <PrimaryButton

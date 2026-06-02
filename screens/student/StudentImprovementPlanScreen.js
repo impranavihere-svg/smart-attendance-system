@@ -23,6 +23,7 @@ function formatClassesNeeded(count) {
 
 export default function StudentImprovementPlanScreen({ route }) {
   const user = route.params?.user;
+  const quoteParam = route.params?.quote;
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -41,7 +42,7 @@ export default function StudentImprovementPlanScreen({ route }) {
   const percentage = student?.percentage ?? 0;
   const present = student?.present ?? 0;
   const totalClasses = student?.totalClasses ?? 0;
-  const alert = getStudentAttendanceAlert(percentage);
+  const alert = getStudentAttendanceAlert(percentage, quoteParam);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -61,7 +62,7 @@ export default function StudentImprovementPlanScreen({ route }) {
 
       {alert ? (
         <View style={styles.quoteCard}>
-          <Text style={styles.quoteLabel}>Your focus</Text>
+          <Text style={styles.quoteLabel}>Quote of the Day</Text>
           <Text style={styles.quoteText}>&ldquo;{alert.quote}&rdquo;</Text>
         </View>
       ) : null}
